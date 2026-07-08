@@ -269,12 +269,18 @@ class Game {
     const speaker = aliveSpeakers[this.currentSpeakerIndex];
     const timeLimit = this.room.settings.describeTime;
 
+    const describedIds = this.speakOrder
+      .filter(p => p.description && p.isAlive)
+      .map(p => p.id);
+
     this.room.broadcast('describe_turn', {
       speakerId: speaker.id,
       speakerName: speaker.name,
       timeLimit,
       index: this.currentSpeakerIndex,
       total: aliveSpeakers.length,
+      alivePlayers: aliveSpeakers.map(p => ({ id: p.id, name: p.name, isAlive: p.isAlive })),
+      describedIds,
     });
 
     // 倒计时
@@ -386,6 +392,11 @@ class Game {
     this.room.broadcast('vote_progress', {
       votedCount,
       totalCount: aliveCount,
+    });
+
+    // 广播谁已投票（仅 ID，不透露投给谁）
+    this.room.broadcast('vote_status', {
+      votedPlayerIds: Object.keys(this.votes),
     });
 
     // 所有人都投票了

@@ -39,6 +39,7 @@
           <div class="room-info">
             <span class="room-label">房间</span>
             <span class="room-code" id="lobby-room-code">------</span>
+            <button class="btn-icon-sm" id="btn-copy-room" title="复制房间号">📋</button>
           </div>
           <div class="header-actions">
             <button class="btn-icon" id="btn-settings" title="设置">⚙️</button>
@@ -162,10 +163,14 @@
       <div class="word-container">
         <div class="phase-badge">第 <span id="word-round">1</span> 轮</div>
         <div class="role-badge" id="word-role-badge">平民</div>
-        <div class="card-wrapper">
-          <div class="card" id="word-card">
+        <div class="card-wrapper" id="word-card-wrapper">
+          <div class="card card-flip" id="word-card">
             <div class="card-face card-front">
-              <p class="card-label">你的词语</p>
+              <p class="card-label">点击翻开你的词语</p>
+              <div class="card-question">?</div>
+            </div>
+            <div class="card-face card-back">
+              <p class="card-label" id="word-role-label">你的词语</p>
               <p class="card-word" id="word-text">------</p>
               <p class="card-hint" id="word-hint">请记住你的词语</p>
             </div>
@@ -187,7 +192,11 @@
           <span class="turn-indicator" id="desc-turn-indicator">等待中...</span>
         </div>
         <div class="descriptions-list" id="descriptions-list">
-          <div class="desc-placeholder">等待第一位玩家描述...</div>
+          <div class="desc-placeholder">
+            <div class="empty-icon">🎤</div>
+            <div>等待玩家描述...</div>
+            <div class="empty-hint">每人用一句话形容自己的词，不能直接说出那个词</div>
+          </div>
         </div>
         <div class="describe-input-area" id="describe-input-area" style="display:none">
           <div class="describe-timer-bar">
@@ -202,6 +211,7 @@
           <div class="spinner"></div>
           <span id="desc-waiting-text">等待其他玩家描述...</span>
         </div>
+        <div class="player-status-bar" id="desc-status-bar"></div>
       </div>
     </div>
 
@@ -219,6 +229,7 @@
           <span id="vote-count">0</span>/<span id="vote-total">0</span> 已投票
         </div>
         <div class="player-grid" id="vote-player-list"></div>
+        <div class="player-status-bar" id="vote-status-bar"></div>
       </div>
     </div>
 
@@ -276,6 +287,7 @@
               <span class="word-reveal-word" id="victory-spy-word">---</span>
             </div>
           </div>
+          <div class="victory-taunt" id="victory-taunt">败者：拉完了</div>
           <div class="victory-actions">
             <button class="btn btn-primary btn-large" id="btn-play-again">再来一局</button>
             <button class="btn btn-secondary btn-large" id="btn-back-lobby">返回大厅</button>

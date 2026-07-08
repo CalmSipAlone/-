@@ -62,7 +62,39 @@ function resetToWelcome() {
   $('nickname-input').value = '';
   $('room-code-input').value = '';
   document.querySelectorAll('.confetti-container, .particle').forEach(el => el.remove());
+  document.title = '谁是卧底';
   showScreen('welcome');
+}
+
+function updateTitle(suffix) {
+  document.title = suffix ? `谁是卧底 - ${suffix}` : '谁是卧底';
+}
+
+// ============ 玩家状态条 ============
+function renderDescStatusBar(players, describedIds, currentSpeakerId) {
+  const bar = $('desc-status-bar');
+  bar.innerHTML = players.filter(p => p.isAlive).map(p => {
+    const isDone = describedIds.includes(p.id);
+    const isCurrent = p.id === currentSpeakerId;
+    let cls = 'status-dot';
+    let dotCls = 'gray';
+    let label = escapeHtml(p.name);
+    if (isCurrent) { cls += ' waiting'; dotCls = 'yellow'; label += ' 🎤'; }
+    else if (isDone) { cls += ' done'; dotCls = 'green'; label += ' ✓'; }
+    return `<span class="${cls}"><span class="dot ${dotCls}"></span>${label}</span>`;
+  }).join('');
+}
+
+function renderVoteStatusBar(players, votedIds) {
+  const bar = $('vote-status-bar');
+  bar.innerHTML = players.filter(p => p.isAlive).map(p => {
+    const hasVoted = votedIds.includes(p.id);
+    const isMe = p.id === state.playerId;
+    const cls = `status-dot ${hasVoted ? 'voted' : ''}`;
+    const dotCls = hasVoted ? 'blue' : 'gray';
+    const label = hasVoted ? `${escapeHtml(p.name)} ✓` : (isMe ? `${escapeHtml(p.name)}（你）` : escapeHtml(p.name));
+    return `<span class="${cls}"><span class="dot ${dotCls}"></span>${label}</span>`;
+  }).join('');
 }
 
 // =====================================================
@@ -113,6 +145,11 @@ $('btn-start-game').addEventListener('click', () => {
   socket.emit('start_game', { settings: gatherSettings() });
 });
 $('btn-leave').addEventListener('click', () => { socket.emit('leave_room'); resetToWelcome(); });
+$('btn-copy-room').addEventListener('click', () => {
+  const code = $('lobby-room-code').textContent;
+  if (!code || code === '------') return;
+  navigator.clipboard.writeText(code).then(() => showToast('房间号已复制 📋')).catch(() => showToast('复制失败，请手动记下房间号', 'error'));
+});
 
 // =====================================================
 //  设置
@@ -149,6 +186,15 @@ function gatherSettings() {
 // =====================================================
 //  看词
 // =====================================================
+// 翻牌动画
+$('word-card-wrapper').addEventListener('click', () => {
+  const card = $('word-card');
+  if (!card.classList.contains('flipped')) {
+    card.classList.add('flipped');
+    $('btn-confirm-word').style.display = 'inline-flex';
+  }
+});
+
 $('btn-confirm-word').addEventListener('click', () => {
   $('btn-confirm-word').disabled = true;
   $('btn-confirm-word').textContent = '已确认 ✓';
@@ -219,6 +265,7 @@ function renderVotePlayers(players) {
     if (p.id === state.playerId) {
       card.classList.add('self');
       card.innerHTML = `<div class="name">${escapeHtml(p.name)}</div><div style="font-size:12px;color:rgba(255,255,255,0.3)">（你自己）</div>`;
+      card.addEventListener('click', () => showToast('不能投给自己', 'error'));
     } else {
       card.innerHTML = `<div class="name">${escapeHtml(p.name)}</div>`;
       card.addEventListener('click', () => {
@@ -299,6 +346,7 @@ function startGuessTimer(sec) {
 // =====================================================
 function showVoteResult(data) {
   showScreen('result');
+  updateTitle(`${state.roomCode} | 结果`);
   const reveal = $('result-reveal');
   reveal.innerHTML = '';
   $('btn-continue').style.display = 'none';
@@ -416,6 +464,16 @@ function showVictory(data) {
     grid.after(gi);
   }
 
+  // 判断败者显示嘲讽
+  const taunt = $('victory-taunt');
+  const isLoser = (
+    (data.winner === 'civilian' && state.role !== 'civilian') ||
+    (data.winner === 'spy' && state.role !== 'spy') ||
+    (data.winner === 'white' && state.role !== 'white') ||
+    (data.winner === 'spy_or_white' && state.role === 'civilian')
+  );
+  taunt.style.display = isLoser ? 'block' : 'none';
+
   launchEffects(data.winner, data.isSpecialWin);
 }
 
@@ -468,11 +526,13 @@ socket.on('room_created', d => {
   Object.assign(state, { playerId: d.playerId, roomCode: d.roomCode, isHost: true });
   showScreen('lobby');
   renderLobby(d.room);
+  updateTitle(`${d.roomCode} | 大厅`);
 });
 socket.on('room_joined', d => {
   Object.assign(state, { playerId: d.playerId, roomCode: d.room.code, isHost: d.room.hostId === d.playerId });
   showScreen('lobby');
   renderLobby(d.room);
+  updateTitle(`${d.room.code} | 大厅`);
 });
 socket.on('player_joined', d => {
   renderPlayers(d.players);
@@ -491,18 +551,26 @@ socket.on('kicked', () => { showToast('你被房主移出了房间', 'error'); r
 socket.on('phase_changed', d => {
   state.currentPhase = d.phase;
   switch (d.phase) {
-    case 'starting': showToast('游戏即将开始...'); break;
+    case 'starting':
+      showToast('游戏即将开始...');
+      updateTitle(`${state.roomCode} | 准备中`);
+      break;
     case 'rules':
       showScreen('rules');
       startRulesTimer(d.duration || 6);
+      updateTitle(`${state.roomCode} | 规则`);
       break;
     case 'dealing':
       showScreen('word');
       $('word-round').textContent = d.round || 1;
       $('confirm-count').textContent = '0';
       $('confirm-total').textContent = '?';
+      // 重置翻牌
+      $('word-card').classList.remove('flipped');
+      $('btn-confirm-word').style.display = 'none';
       $('btn-confirm-word').disabled = false;
       $('btn-confirm-word').textContent = '我已记住，确认';
+      updateTitle(`${state.roomCode} | 看词`);
       break;
     case 'describing':
       showScreen('describe');
@@ -520,8 +588,6 @@ socket.on('phase_changed', d => {
 });
 
 // -- 投票玩家列表 --
-socket.on('vote_players', d => renderVotePlayers(d.players));
-
 // -- 角色分配 --
 socket.on('your_role', d => {
   state.role = d.role;
@@ -560,6 +626,11 @@ socket.on('describe_turn', d => {
     $('desc-waiting-text').textContent = `等待 ${escapeHtml(d.speakerName)} 描述...`;
     $('desc-turn-indicator').textContent = `${escapeHtml(d.speakerName)} 描述中...`;
   }
+  // 更新玩家描述状态条
+  if (d.alivePlayers) {
+    renderDescStatusBar(d.alivePlayers, d.describedIds || [], d.speakerId);
+  }
+  updateTitle(`${state.roomCode} | 描述中`);
 });
 socket.on('description_received', d => addDescItem(d.playerName, d.description, d.playerId === state.playerId));
 socket.on('all_descriptions', d => {
@@ -575,6 +646,18 @@ socket.on('vote_progress', d => {
   $('vote-count').textContent = d.votedCount;
   $('vote-total').textContent = d.totalCount;
 });
+let _votePlayers = [];
+socket.on('vote_players', d => {
+  _votePlayers = d.players;
+  renderVotePlayers(d.players);
+  renderVoteStatusBar(d.players, []);
+  updateTitle(`${state.roomCode} | 投票中`);
+});
+socket.on('vote_status', d => {
+  if (_votePlayers.length) {
+    renderVoteStatusBar(_votePlayers, d.votedPlayerIds || []);
+  }
+});
 socket.on('vote_result', d => {
   clearInterval(state.voteTimer);
   showVoteResult(d);
@@ -584,6 +667,7 @@ socket.on('vote_result', d => {
 socket.on('guess_phase', d => {
   showScreen('guess');
   $('guess-round').textContent = d.round || 1;
+  updateTitle(`${state.roomCode} | 猜词`);
   if (d.canGuess) {
     $('guess-input-area').style.display = 'block';
     $('guess-waiting').style.display = 'none';
@@ -611,12 +695,16 @@ socket.on('guess_skipped', () => {
 });
 
 // -- 结束 --
-socket.on('game_ended', d => showVictory(d));
+socket.on('game_ended', d => {
+  showVictory(d);
+  updateTitle(`${state.roomCode} | 游戏结束`);
+});
 
 socket.on('return_to_lobby', d => {
   state.isHost = d.room.hostId === state.playerId;
   showScreen('lobby');
   renderLobby(d.room);
+  updateTitle(`${state.roomCode} | 大厅`);
 });
 
 // -- 错误 --
