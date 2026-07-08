@@ -336,6 +336,15 @@ class Game {
 
   // ===== 投票阶段 =====
   startVotePhase() {
+    const alivePlayers = this.room.players.filter(p => p.isAlive && p.isConnected);
+    // 少于2人存活时跳过投票
+    if (alivePlayers.length < 2) {
+      this.phase = 'processing';
+      this.room.broadcast('phase_changed', { phase: 'result_skip' });
+      setTimeout(() => this.checkWinCondition(), 1500);
+      return;
+    }
+
     this.phase = 'voting';
     const timeLimit = this.room.settings.voteTime;
 
@@ -346,12 +355,11 @@ class Game {
     });
 
     // 发送存活玩家列表用于投票
-    const alivePlayers = this.room.players.filter(p => p.isAlive).map(p => ({
+    this.room.broadcast('vote_players', { players: alivePlayers.map(p => ({
       id: p.id,
       name: p.name,
       isAlive: p.isAlive,
-    }));
-    this.room.broadcast('vote_players', { players: alivePlayers });
+    })) });
 
     this.room.timers.voteTimer = setTimeout(() => {
       this.processVotes();
@@ -464,12 +472,6 @@ class Game {
         this.endGame('spy_or_white', false);
         return;
       }
-    }
-
-    // 到达轮数限制 → 平民胜（卧底没能在限时内获胜）
-    if (this.round >= this.room.settings.roundLimit) {
-      this.endGame('civilian', false);
-      return;
     }
 
     // 游戏继续 → 进入猜词阶段
@@ -594,8 +596,15 @@ class Game {
     this.eliminatedThisRound = [];
     this.guessResult = null;
 
-    // 重新发牌
-    this.deal();
+    // 重置本轮状态，但保留角色和词语（不重新发牌）
+    this.room.players.forEach(p => {
+      p.description = null;
+      p.voted = false;
+      // hasGuessed 不清除，猜词机会全局仅一次
+    });
+
+    // 直接开始下一轮描述（沿用原词）
+    this.startDescribePhase();
   }
 
   // ===== 游戏结束 =====
@@ -750,8 +759,9 @@ io.on('connection', (socket) => {
     }
 
     const connected = room.players.filter(p => p.isConnected);
-    if (connected.length < 4) {
-      socket.emit('error', { msg: '至少需要4名玩家才能开始' });
+    // 允许任意人数开局（1人也可测试）
+    if (connected.length < 1) {
+      socket.emit('error', { msg: '至少需要1名玩家' });
       return;
     }
 
@@ -770,8 +780,12 @@ io.on('connection', (socket) => {
     room.broadcast('phase_changed', { phase: 'starting' });
 
     setTimeout(() => {
-      game.deal();
-    }, 1500);
+      // 先展示规则说明（6秒后自动进入发牌）
+      room.broadcast('phase_changed', { phase: 'rules', duration: 6 });
+      room.timers.rulesTimer = setTimeout(() => {
+        game.deal();
+      }, 6000);
+    }, 1000);
   });
 
   // ===== 确认看词 =====

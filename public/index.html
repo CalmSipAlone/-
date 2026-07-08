@@ -113,6 +113,50 @@
       </div>
     </div>
 
+    <!-- ========= 规则说明 ========= -->
+    <div id="screen-rules" class="screen">
+      <div class="rules-container">
+        <div class="rules-header">
+          <div class="rules-icon">📖</div>
+          <h2>游戏规则</h2>
+        </div>
+        <div class="rules-content">
+          <div class="rules-step">
+            <div class="rules-step-icon">🃏</div>
+            <div class="rules-step-text">
+              <strong>发词</strong>
+              <p>每人获得一个词语。<span class="tag civilian">平民</span>拿相同词，<span class="tag spy">卧底</span>拿相近词，<span class="tag white">白板</span>没词全靠演。</p>
+            </div>
+          </div>
+          <div class="rules-step">
+            <div class="rules-step-icon">🎤</div>
+            <div class="rules-step-text">
+              <strong>描述</strong>
+              <p>轮流用一句话形容你的词。<span class="highlight">不能直接说出词</span>，卧底要伪装，平民别暴露。</p>
+            </div>
+          </div>
+          <div class="rules-step">
+            <div class="rules-step-icon">🗳️</div>
+            <div class="rules-step-text">
+              <strong>投票</strong>
+              <p>所有人描述完毕，投票选出最可疑的人。得票最多者出局。</p>
+            </div>
+          </div>
+          <div class="rules-step">
+            <div class="rules-step-icon">🏆</div>
+            <div class="rules-step-text">
+              <strong>胜负</strong>
+              <p>卧底被投出 → <span class="tag civilian">平民胜</span> ｜ 卧底活到最后 → <span class="tag spy">卧底胜</span><br>卧底/白板猜对平民词 → <span class="tag special">特殊胜利</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="rules-timer">
+          <div class="rules-timer-bar" id="rules-timer-fill"></div>
+        </div>
+        <p class="rules-tip" id="rules-tip">游戏即将开始...</p>
+      </div>
+    </div>
+
     <!-- ========= 看词 ========= -->
     <div id="screen-word" class="screen">
       <div class="word-container">

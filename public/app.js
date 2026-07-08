@@ -17,6 +17,7 @@ const $ = id => document.getElementById(id);
 const screens = {
   welcome: $('screen-welcome'),
   lobby: $('screen-lobby'),
+  rules: $('screen-rules'),
   word: $('screen-word'),
   describe: $('screen-describe'),
   vote: $('screen-vote'),
@@ -103,8 +104,8 @@ function renderPlayers(players) {
 function updateStartBtn(count) {
   const btn = $('btn-start-game');
   const hint = $('lobby-hint');
-  if (count < 4) { btn.disabled = true; hint.textContent = `至少需要 4 人才能开始（当前 ${count} 人）`; }
-  else { btn.disabled = false; hint.textContent = ''; }
+  btn.disabled = false;
+  hint.textContent = count <= 1 ? '单人测试模式' : `${count} 人准备就绪`;
 }
 
 $('btn-start-game').addEventListener('click', () => {
@@ -270,6 +271,19 @@ $('btn-submit-guess').addEventListener('click', () => {
 });
 $('guess-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-submit-guess').click(); });
 $('btn-skip-guess').addEventListener('click', () => socket.emit('skip_guess'));
+
+function startRulesTimer(sec) {
+  const fill = $('rules-timer-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  setTimeout(() => {
+    fill.style.transition = `width ${sec}s linear`;
+    fill.style.width = '0%';
+  }, 100);
+  $('rules-tip').textContent = `游戏将在 ${sec} 秒后开始...`;
+  let n = sec;
+  const t = setInterval(() => { n--; if (n > 0) $('rules-tip').textContent = `游戏将在 ${n} 秒后开始...`; else clearInterval(t); }, 1000);
+}
 
 function startGuessTimer(sec) {
   if (state.guessTimer) clearInterval(state.guessTimer);
@@ -478,6 +492,10 @@ socket.on('phase_changed', d => {
   state.currentPhase = d.phase;
   switch (d.phase) {
     case 'starting': showToast('游戏即将开始...'); break;
+    case 'rules':
+      showScreen('rules');
+      startRulesTimer(d.duration || 6);
+      break;
     case 'dealing':
       showScreen('word');
       $('word-round').textContent = d.round || 1;

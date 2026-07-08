@@ -199,6 +199,36 @@ input[type="text"]:focus { background: rgba(255,255,255,0.15); }
 .result-detail { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
 .result-tie { color: #f0c040; font-size: 16px; padding: 20px 0; }
 
+/* ============ 规则说明 ============ */
+#screen-rules { flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.rules-container { width: 100%; max-width: 400px; }
+.rules-header { text-align: center; margin-bottom: 24px; }
+.rules-icon { font-size: 48px; margin-bottom: 8px; }
+.rules-header h2 { font-size: 24px; font-weight: 700; }
+.rules-content { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+.rules-step {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 16px;
+  animation: rulesFadeIn 0.5s ease forwards; opacity: 0;
+}
+.rules-step:nth-child(1) { animation-delay: 0.2s; }
+.rules-step:nth-child(2) { animation-delay: 0.4s; }
+.rules-step:nth-child(3) { animation-delay: 0.6s; }
+.rules-step:nth-child(4) { animation-delay: 0.8s; }
+@keyframes rulesFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.rules-step-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+.rules-step-text strong { display: block; font-size: 15px; margin-bottom: 4px; }
+.rules-step-text p { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.7); }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.tag.civilian { background: rgba(70,200,120,0.25); color: #5ee090; }
+.tag.spy { background: rgba(200,70,70,0.25); color: #ff7070; }
+.tag.white { background: rgba(150,100,255,0.25); color: #b080ff; }
+.tag.special { background: rgba(255,215,0,0.25); color: #ffd700; }
+.highlight { color: #ffcc44; font-weight: 600; }
+.rules-timer { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 8px; overflow: hidden; }
+.rules-timer-bar { height: 100%; background: linear-gradient(90deg, #667eea, #e060c0); border-radius: 2px; width: 100%; }
+.rules-tip { text-align: center; font-size: 14px; color: rgba(255,255,255,0.4); }
+
 /* ============ 结算 ============ */
 #screen-victory { flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 .victory-container {
