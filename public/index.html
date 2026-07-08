@@ -3,64 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>谁是卧底</title>
+  <title>谁是卧底 - 桌游派对</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="app">
-    <!-- ========= 首页 ========= -->
+
+    <!-- ==================== 首页 ==================== -->
     <div id="screen-welcome" class="screen active">
-      <div class="welcome-container">
-        <div class="logo">
-          <div class="logo-icon">🕵️</div>
-          <h1>谁是卧底</h1>
-          <p class="subtitle">多人联机 · 推理交友</p>
-        </div>
-        <div class="welcome-form">
-          <div class="input-group">
-            <label>你的昵称</label>
-            <input type="text" id="nickname-input" maxlength="10" placeholder="输入昵称..." autocomplete="off">
+      <div class="welcome-scene">
+        <div class="welcome-table">
+          <div class="welcome-lamp"></div>
+          <div class="welcome-content">
+            <div class="welcome-icon">🕵️</div>
+            <h1 class="welcome-title">谁是卧底</h1>
+            <p class="welcome-sub">桌游派对</p>
+            <div class="welcome-deco">♠ ♥ ♣ ♦</div>
+            <div class="welcome-form">
+              <div class="input-group">
+                <label>你的昵称</label>
+                <input type="text" id="nickname-input" maxlength="10" placeholder="输入昵称..." autocomplete="off">
+              </div>
+              <button class="btn btn-primary btn-large" id="btn-create-room">创建房间</button>
+              <div class="divider"><span>或</span></div>
+              <div class="join-row">
+                <input type="text" id="room-code-input" maxlength="6" placeholder="房间号" class="input-code" autocomplete="off" style="text-transform:uppercase">
+                <button class="btn btn-secondary btn-join" id="btn-join-room">加入</button>
+              </div>
+            </div>
+            <p class="welcome-footer-text">打开即玩 · 无需注册</p>
           </div>
-          <button class="btn btn-primary" id="btn-create-room">创建房间</button>
-          <div class="divider"><span>或</span></div>
-          <div class="join-row">
-            <input type="text" id="room-code-input" maxlength="6" placeholder="房间号" class="input-code" autocomplete="off" style="text-transform:uppercase">
-            <button class="btn btn-secondary" id="btn-join-room">加入</button>
-          </div>
         </div>
-        <p class="footer-tip">打开即玩 · 无需注册</p>
       </div>
     </div>
 
-    <!-- ========= 大厅 ========= -->
+    <!-- ==================== 大厅 ==================== -->
     <div id="screen-lobby" class="screen">
-      <div class="lobby-container">
-        <div class="lobby-header">
-          <div class="room-info">
-            <span class="room-label">房间</span>
-            <span class="room-code" id="lobby-room-code">------</span>
-            <button class="btn-icon-sm" id="btn-copy-room" title="复制房间号">📋</button>
-          </div>
-          <div class="header-actions">
-            <button class="btn-icon" id="btn-settings" title="设置">⚙️</button>
-            <button class="btn-icon" id="btn-leave" title="离开">🚪</button>
+      <div class="scene">
+        <div class="top-bar">
+          <div class="top-left">🎲 谁是卧底</div>
+          <div class="top-center" id="lobby-info">等待玩家加入</div>
+          <div class="top-right">
+            <button class="btn-wood" id="btn-settings-lobby" title="设置">⚙️</button>
           </div>
         </div>
-        <div class="lobby-content">
-          <div class="player-grid" id="lobby-player-list"></div>
-          <div class="lobby-footer">
-            <div class="player-count"><span id="lobby-player-count">0</span>/10 人</div>
-            <p class="lobby-hint" id="lobby-hint">至少 4 人才能开始</p>
-            <button class="btn btn-primary btn-large" id="btn-start-game" disabled>开始游戏</button>
+        <div class="table-area">
+          <div class="table-surface">
+            <div class="tablecloth">
+              <div class="lobby-header-card">
+                <span class="room-label">房间号</span>
+                <span class="room-code" id="lobby-room-code">------</span>
+                <button class="btn-icon-sm" id="btn-copy-room" title="复制">📋</button>
+              </div>
+              <div class="player-ring" id="lobby-player-ring"></div>
+              <div class="lobby-footer-card">
+                <div class="player-count"><span id="lobby-player-count">0</span> 人</div>
+                <p class="lobby-hint" id="lobby-hint">等待更多玩家...</p>
+                <button class="btn btn-primary btn-large" id="btn-start-game" disabled>开始游戏</button>
+              </div>
+            </div>
           </div>
+        </div>
+        <div class="bottom-bar">
+          <button class="btn-wood btn-wood-wide" id="btn-leave">🚪 离开房间</button>
         </div>
       </div>
 
       <!-- 设置弹窗 -->
       <div class="modal" id="settings-modal">
         <div class="modal-backdrop"></div>
-        <div class="modal-content">
-          <h3>房间设置</h3>
+        <div class="modal-content modal-wood">
+          <h3>⚙️ 房间设置</h3>
           <div class="settings-group">
             <div class="setting-row">
               <label>卧底人数</label>
@@ -72,17 +85,11 @@
             </div>
             <div class="setting-row">
               <label>白板模式</label>
-              <label class="toggle">
-                <input type="checkbox" id="setting-whiteMode">
-                <span class="toggle-slider"></span>
-              </label>
+              <label class="toggle"><input type="checkbox" id="setting-whiteMode"><span class="toggle-slider"></span></label>
             </div>
             <div class="setting-row">
               <label>允许猜词</label>
-              <label class="toggle">
-                <input type="checkbox" id="setting-guessEnabled" checked>
-                <span class="toggle-slider"></span>
-              </label>
+              <label class="toggle"><input type="checkbox" id="setting-guessEnabled" checked><span class="toggle-slider"></span></label>
             </div>
             <div class="setting-row">
               <label>描述时间</label>
@@ -100,155 +107,146 @@
                 <button class="btn-setting" data-setting="voteTime" data-action="inc">+</button>
               </div>
             </div>
-            <div class="setting-row">
-              <label>轮数限制</label>
-              <div class="setting-control">
-                <button class="btn-setting" data-setting="roundLimit" data-action="dec">−</button>
-                <span id="setting-roundLimit">3</span>
-                <button class="btn-setting" data-setting="roundLimit" data-action="inc">+</button>
-              </div>
-            </div>
           </div>
           <button class="btn btn-primary" id="btn-settings-close">确定</button>
         </div>
       </div>
     </div>
 
-    <!-- ========= 规则说明 ========= -->
+    <!-- ==================== 规则 ==================== -->
     <div id="screen-rules" class="screen">
-      <div class="rules-container">
-        <div class="rules-header">
-          <div class="rules-icon">📖</div>
-          <h2>游戏规则</h2>
-        </div>
-        <div class="rules-content">
-          <div class="rules-step">
-            <div class="rules-step-icon">🃏</div>
-            <div class="rules-step-text">
-              <strong>发词</strong>
-              <p>每人获得一个词语。<span class="tag civilian">平民</span>拿相同词，<span class="tag spy">卧底</span>拿相近词，<span class="tag white">白板</span>没词全靠演。</p>
+      <div class="scene">
+        <div class="top-bar"><div class="top-left">📖 游戏规则</div></div>
+        <div class="table-area">
+          <div class="table-surface">
+            <div class="tablecloth">
+              <div class="rules-content">
+                <div class="rules-step"><span class="rules-step-icon">🃏</span><div class="rules-step-text"><strong>发词</strong><p><span class="tag civilian">平民</span>拿相同词，<span class="tag spy">卧底</span>拿相近词，<span class="tag white">白板</span>没词全靠演</p></div></div>
+                <div class="rules-step"><span class="rules-step-icon">🎤</span><div class="rules-step-text"><strong>描述</strong><p>轮流用一句话形容你的词，<span class="highlight">不能直接说出词</span></p></div></div>
+                <div class="rules-step"><span class="rules-step-icon">🗳️</span><div class="rules-step-text"><strong>投票</strong><p>每人描述完毕，投票选出最可疑的人，得票最多者出局</p></div></div>
+                <div class="rules-step"><span class="rules-step-icon">🏆</span><div class="rules-step-text"><strong>胜负</strong><p>卧底被投出→<span class="tag civilian">平民胜</span>｜卧底活到最后→<span class="tag spy">卧底胜</span></p></div></div>
+              </div>
+              <div class="rules-timer-bar"><div class="timer-fill" id="rules-timer-fill"></div></div>
+              <p class="rules-tip" id="rules-tip">游戏即将开始...</p>
             </div>
           </div>
-          <div class="rules-step">
-            <div class="rules-step-icon">🎤</div>
-            <div class="rules-step-text">
-              <strong>描述</strong>
-              <p>轮流用一句话形容你的词。<span class="highlight">不能直接说出词</span>，卧底要伪装，平民别暴露。</p>
-            </div>
-          </div>
-          <div class="rules-step">
-            <div class="rules-step-icon">🗳️</div>
-            <div class="rules-step-text">
-              <strong>投票</strong>
-              <p>所有人描述完毕，投票选出最可疑的人。得票最多者出局。</p>
-            </div>
-          </div>
-          <div class="rules-step">
-            <div class="rules-step-icon">🏆</div>
-            <div class="rules-step-text">
-              <strong>胜负</strong>
-              <p>卧底被投出 → <span class="tag civilian">平民胜</span> ｜ 卧底活到最后 → <span class="tag spy">卧底胜</span><br>卧底/白板猜对平民词 → <span class="tag special">特殊胜利</span></p>
-            </div>
-          </div>
-        </div>
-        <div class="rules-timer">
-          <div class="rules-timer-bar" id="rules-timer-fill"></div>
-        </div>
-        <p class="rules-tip" id="rules-tip">游戏即将开始...</p>
-      </div>
-    </div>
-
-    <!-- ========= 看词 ========= -->
-    <div id="screen-word" class="screen">
-      <div class="word-container">
-        <div class="phase-badge">第 <span id="word-round">1</span> 轮</div>
-        <div class="role-badge" id="word-role-badge">平民</div>
-        <div class="card-wrapper" id="word-card-wrapper">
-          <div class="card card-flip" id="word-card">
-            <div class="card-face card-front">
-              <p class="card-label">点击翻开你的词语</p>
-              <div class="card-question">?</div>
-            </div>
-            <div class="card-face card-back">
-              <p class="card-label" id="word-role-label">你的词语</p>
-              <p class="card-word" id="word-text">------</p>
-              <p class="card-hint" id="word-hint">请记住你的词语</p>
-            </div>
-          </div>
-        </div>
-        <p class="word-warning">⚠️ 请确保周围无人偷看</p>
-        <button class="btn btn-primary" id="btn-confirm-word">我已记住，确认</button>
-        <div class="confirm-progress">
-          <span id="confirm-count">0</span>/<span id="confirm-total">0</span> 已确认
         </div>
       </div>
     </div>
 
-    <!-- ========= 描述 ========= -->
-    <div id="screen-describe" class="screen">
-      <div class="describe-container">
-        <div class="phase-header">
-          <span class="phase-badge">第 <span id="desc-round">1</span> 轮 · 描述</span>
-          <span class="turn-indicator" id="desc-turn-indicator">等待中...</span>
-        </div>
-        <div class="descriptions-list" id="descriptions-list">
-          <div class="desc-placeholder">
-            <div class="empty-icon">🎤</div>
-            <div>等待玩家描述...</div>
-            <div class="empty-hint">每人用一句话形容自己的词，不能直接说出那个词</div>
+    <!-- ==================== 游戏主界面（看词/描述/投票/猜词共用） ==================== -->
+    <div id="screen-game" class="screen">
+      <div class="scene">
+        <!-- 顶部栏 -->
+        <div class="top-bar">
+          <div class="top-left">🎲 谁是卧底</div>
+          <div class="top-center" id="game-phase-info">第 1 回合 · 描述中</div>
+          <div class="top-right">
+            <span class="timer-badge" id="game-timer" style="display:none"><span id="timer-value">30</span>s</span>
           </div>
         </div>
-        <div class="describe-input-area" id="describe-input-area" style="display:none">
-          <div class="describe-timer-bar">
-            <div class="timer-fill" id="describe-timer-fill"></div>
+
+        <!-- 圆桌区 -->
+        <div class="table-area">
+          <div class="table-surface">
+            <div class="tablecloth">
+              <!-- 环形玩家 -->
+              <div class="player-ring" id="game-player-ring"></div>
+              <!-- 桌面中央信息 -->
+              <div class="table-center" id="table-center-area">
+                <div class="mini-card" id="center-phase">描述阶段</div>
+                <div class="mini-card" id="center-spy">卧底存活</div>
+                <div class="mini-card timer-card" id="center-timer">30s</div>
+              </div>
+            </div>
           </div>
-          <div class="describe-input-row">
-            <input type="text" id="describe-input" maxlength="100" placeholder="用一句话描述你的词语..." autocomplete="off">
+        </div>
+
+        <!-- 身份词卡 -->
+        <div class="word-card-area" id="word-card-area">
+          <div class="word-card" id="word-card-toggle">
+            <div class="word-card-inner">
+              <div class="word-card-label">你的词语</div>
+              <div class="word-card-word" id="word-card-text">点击翻开</div>
+              <div class="word-card-role" id="word-card-role">👤 平民</div>
+              <div class="word-card-tip">轻按隐藏 · 仅本人可见</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧信息面板 -->
+        <div class="side-panel" id="side-panel">
+          <div class="side-panel-header" id="side-panel-toggle">
+            <span>📋 记录</span>
+            <span class="side-arrow">◀</span>
+          </div>
+          <div class="side-panel-body" id="side-panel-body">
+            <div class="side-section">
+              <div class="side-section-title">💬 发言记录</div>
+              <div class="side-descriptions" id="side-descriptions">
+                <div class="side-empty">等待发言...</div>
+              </div>
+            </div>
+            <div class="side-section">
+              <div class="side-section-title">🕵️ 卧底剩余</div>
+              <div class="side-spy-count" id="side-spy-count">?</div>
+            </div>
+            <div class="side-section" id="side-vote-section">
+              <div class="side-section-title">🗳️ 投票进度</div>
+              <div class="side-vote-dots" id="side-vote-dots"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="bottom-bar" id="bottom-bar">
+          <button class="btn-action btn-desc" id="btn-describe" style="display:none">🎤 描述</button>
+          <button class="btn-action btn-vote" id="btn-vote" style="display:none">🗳️ 投票</button>
+          <button class="btn-action btn-skip" id="btn-skip" style="display:none">⏭️ 跳过</button>
+          <button class="btn-action btn-log" id="btn-log">📋 发言</button>
+          <button class="btn-action btn-guess" id="btn-guess" style="display:none">🤔 猜词</button>
+          <button class="btn-action btn-confirm" id="btn-confirm-word" style="display:none">✓ 确认</button>
+        </div>
+      </div>
+
+      <!-- 描述输入弹窗 -->
+      <div class="modal" id="describe-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-wood modal-bottom">
+          <div class="modal-handle"></div>
+          <p class="modal-desc-hint" id="modal-desc-hint">用一句话描述你的词语：</p>
+          <div class="desc-timer"><div class="timer-fill" id="desc-timer-fill"></div></div>
+          <div class="modal-input-row">
+            <input type="text" id="describe-input" maxlength="100" placeholder="输入描述..." autocomplete="off">
             <button class="btn btn-primary btn-sm" id="btn-submit-describe">发送</button>
           </div>
+          <button class="btn btn-text" id="btn-cancel-describe">取消</button>
         </div>
-        <div class="waiting-msg" id="desc-waiting-msg" style="display:none">
-          <div class="spinner"></div>
-          <span id="desc-waiting-text">等待其他玩家描述...</span>
-        </div>
-        <div class="player-status-bar" id="desc-status-bar"></div>
       </div>
-    </div>
 
-    <!-- ========= 投票 ========= -->
-    <div id="screen-vote" class="screen">
-      <div class="vote-container">
-        <div class="phase-header">
-          <span class="phase-badge">投票</span>
-          <div class="timer-display" id="vote-timer">
-            <span class="timer-text" id="vote-timer-text">60</span>s
+      <!-- 投票弹窗 -->
+      <div class="modal" id="vote-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-wood vote-modal-content">
+          <h3>🗳️ 投票</h3>
+          <p class="vote-hint">点击你认为最可疑的人</p>
+          <div class="vote-grid" id="vote-grid"></div>
+          <div class="vote-progress-text"><span id="vote-count">0</span>/<span id="vote-total">0</span> 已投票</div>
+          <div class="modal-actions">
+            <button class="btn btn-primary btn-large" id="btn-confirm-vote" disabled>确认投票</button>
           </div>
         </div>
-        <p class="vote-title">请投票选出你最怀疑的人</p>
-        <div class="vote-progress">
-          <span id="vote-count">0</span>/<span id="vote-total">0</span> 已投票
-        </div>
-        <div class="player-grid" id="vote-player-list"></div>
-        <div class="player-status-bar" id="vote-status-bar"></div>
       </div>
-    </div>
 
-    <!-- ========= 猜词 ========= -->
-    <div id="screen-guess" class="screen">
-      <div class="guess-container">
-        <div class="phase-badge">第 <span id="guess-round">1</span> 轮 · 猜词</div>
-        <div class="guess-waiting" id="guess-waiting">
-          <div class="spinner large"></div>
-          <p id="guess-waiting-text">卧底正在思考...</p>
-        </div>
-        <div class="guess-input-area" id="guess-input-area" style="display:none">
-          <div class="guess-icon">🤔</div>
-          <h3>你认为平民的词是什么？</h3>
-          <p class="guess-hint">猜对可获得特殊胜利！猜错也没有损失。</p>
-          <div class="guess-timer-bar">
-            <div class="timer-fill" id="guess-timer-fill"></div>
-          </div>
-          <div class="guess-input-row">
+      <!-- 猜词弹窗 -->
+      <div class="modal" id="guess-modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content modal-wood modal-bottom">
+          <div class="modal-handle"></div>
+          <p class="modal-desc-hint">🤔 你认为平民的词是什么？</p>
+          <p class="guess-hint-text">猜对特殊胜利，猜错无损失</p>
+          <div class="guess-timer-bar"><div class="timer-fill" id="guess-timer-fill"></div></div>
+          <div class="modal-input-row">
             <input type="text" id="guess-input" maxlength="20" placeholder="输入平民词..." autocomplete="off">
             <button class="btn btn-primary btn-sm" id="btn-submit-guess">猜</button>
           </div>
@@ -257,20 +255,26 @@
       </div>
     </div>
 
-    <!-- ========= 结果 ========= -->
+    <!-- ==================== 结果揭晓 ==================== -->
     <div id="screen-result" class="screen">
-      <div class="result-container">
-        <div class="phase-badge" id="result-badge">投票结果</div>
-        <div class="result-reveal" id="result-reveal">
-          <!-- 逐步揭晓内容 -->
+      <div class="scene">
+        <div class="top-bar"><div class="top-left">📊 投票结果</div></div>
+        <div class="table-area">
+          <div class="table-surface">
+            <div class="tablecloth">
+              <div class="result-reveal-content" id="result-reveal-content"></div>
+            </div>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-continue" style="display:none">继续</button>
+        <div class="bottom-bar">
+          <button class="btn btn-primary btn-large" id="btn-continue" style="display:none">继续</button>
+        </div>
       </div>
     </div>
 
-    <!-- ========= 结算 ========= -->
+    <!-- ==================== 结算 ==================== -->
     <div id="screen-victory" class="screen">
-      <div class="victory-container" id="victory-container">
+      <div class="victory-scene">
         <div class="victory-bg" id="victory-bg"></div>
         <div class="victory-content">
           <div class="victory-icon" id="victory-icon">🏆</div>
@@ -278,14 +282,8 @@
           <div class="victory-subtitle" id="victory-subtitle"></div>
           <div class="role-reveal-grid" id="role-reveal-grid"></div>
           <div class="word-reveal">
-            <div class="word-reveal-item">
-              <span class="word-reveal-label">平民词</span>
-              <span class="word-reveal-word" id="victory-civilian-word">---</span>
-            </div>
-            <div class="word-reveal-item">
-              <span class="word-reveal-label">卧底词</span>
-              <span class="word-reveal-word" id="victory-spy-word">---</span>
-            </div>
+            <div class="word-reveal-item"><span class="word-reveal-label">平民词</span><span class="word-reveal-word" id="victory-civilian-word">---</span></div>
+            <div class="word-reveal-item"><span class="word-reveal-label">卧底词</span><span class="word-reveal-word" id="victory-spy-word">---</span></div>
           </div>
           <div class="victory-taunt" id="victory-taunt">败者：拉完了</div>
           <div class="victory-actions">
@@ -296,7 +294,7 @@
       </div>
     </div>
 
-    <!-- ========= Toast 提示 ========= -->
+    <!-- ==================== Toast ==================== -->
     <div id="toast-container"></div>
   </div>
 
